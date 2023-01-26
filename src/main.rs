@@ -19,7 +19,10 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
 }
 
 fn print_stats(content: String) {
-    for a in content.split_whitespace()/*.map(|x| trim_nonalphabetic_front_and_back(x))*/ {
+    for a in content
+        .split_whitespace()
+        .map(|x| trim_nonalphabetic_front_and_back(x))
+    {
         if !a.is_empty() {
             println!("{a}");
         }
@@ -27,22 +30,9 @@ fn print_stats(content: String) {
 }
 
 fn trim_nonalphabetic_front_and_back(source: &str) -> &str {
-    let len: usize = source.len();
-    let mut start_index: usize = len;
-    let mut end_index: usize = len;
-    for (index, item) in source.chars().enumerate() {
-        if item.is_alphabetic() {
-            start_index = index;
-            break;
-        }
-    }
-    for (index, item) in source.chars().rev().enumerate() {
-        if item.is_alphabetic() {
-            end_index = len - index;
-            break;
-        }
-    }
-    &source[start_index..end_index]
+    source
+        .trim_start_matches(|x: char| !x.is_alphabetic())
+        .trim_end_matches(|x: char| !x.is_alphabetic())
 }
 
 #[cfg(test)]
