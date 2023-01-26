@@ -24,3 +24,33 @@ fn print_stats(content: String) {
         println!("{a}");
     }
 }
+
+fn trim_nonalphabetical_front_and_back(source: &str) -> &str {
+    source
+}
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trim_does_not_modify_alphabetical() {
+        assert_eq!(trim_nonalphabetical_front_and_back("word"), "word");
+    }
+
+    #[test]
+    fn trim_removes_front() {
+        assert_eq!(trim_nonalphabetical_front_and_back("hello"), "12hello");
+        assert_eq!(trim_nonalphabetical_front_and_back("foo"), "-foo");
+    }
+ 
+    #[test]
+    fn trim_removes_back() {
+        assert_eq!(trim_nonalphabetical_front_and_back("hello"), "hello34");
+        assert_eq!(trim_nonalphabetical_front_and_back("foo"), "foo+");
+    }
+
+    #[test]
+    fn preserved_middle() {
+        assert_eq!(trim_nonalphabetical_front_and_back("hello-world"), "13hello-world)");
+    }
+}
