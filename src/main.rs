@@ -21,7 +21,7 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
 }
 
 fn print_stats(content: String) {
-    let mut map = HashMap::new();
+    let mut map = HashMap::<&str, u32>::new();
     for word in content
         .split_whitespace()
         .map(|x| trim_nonalphabetic_front_and_back(x))
@@ -30,11 +30,16 @@ fn print_stats(content: String) {
         let count = map.entry(word).or_insert(0u32);
         *count += 1;
     }
-    println!("{:?}", map);
     match map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x))
     {
         Some(sum) => println!("total word count: {}", sum),
         None => println!("An error occured while counting words"),
+    }
+    let mut vec: Vec<(&str, u32)> = map.into_iter().collect();
+    vec.sort_by(|(_,l),(_,r)| r.cmp(l));
+    let top = if vec.len() < 10 { vec.len() } else { 10 };
+    for t in &vec[..top] {
+        println!("{t:?}");
     }
 }
 
