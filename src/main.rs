@@ -25,42 +25,58 @@ fn print_stats(content: String) {
 }
 
 fn trim_nonalphabetic_front_and_back(source: &str) -> &str {
-    let mut start_index: usize = 0;
+    let len: usize = source.len();
+    let mut start_index: usize = len;
+    let mut end_index: usize = len;
     for (index, item) in source.chars().enumerate() {
         if item.is_alphabetic() {
             start_index = index;
             break;
         }
     }
-    &source[start_index..]
+    for (index, item) in source.chars().rev().enumerate() {
+        if item.is_alphabetic() {
+            end_index = len - index;
+            break;
+        }
+    }
+    &source[start_index..end_index]
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    mod trim {
+        use crate::trim_nonalphabetic_front_and_back;
 
-    #[test]
-    fn trim_does_not_modify_alphabetical() {
-        assert_eq!(trim_nonalphabetic_front_and_back("word"), "word");
-    }
+        #[test]
+        fn does_not_modify_alphabetical() {
+            assert_eq!(trim_nonalphabetic_front_and_back("word"), "word");
+        }
 
-    #[test]
-    fn trim_removes_front() {
-        assert_eq!(trim_nonalphabetic_front_and_back("12hello"), "hello");
-        assert_eq!(trim_nonalphabetic_front_and_back("-foo"), "foo");
-    }
+        #[test]
+        fn removes_front() {
+            assert_eq!(trim_nonalphabetic_front_and_back("12hello"), "hello");
+            assert_eq!(trim_nonalphabetic_front_and_back("-foo"), "foo");
+        }
 
-    #[test]
-    fn trim_removes_back() {
-        assert_eq!(trim_nonalphabetic_front_and_back("hello34"), "hello");
-        assert_eq!(trim_nonalphabetic_front_and_back("foo+"), "foo");
-    }
+        #[test]
+        fn removes_back() {
+            assert_eq!(trim_nonalphabetic_front_and_back("hello34"), "hello");
+            assert_eq!(trim_nonalphabetic_front_and_back("foo+"), "foo");
+        }
 
-    #[test]
-    fn preserved_middle() {
-        assert_eq!(
-            trim_nonalphabetic_front_and_back("13hello-world)"),
-            "hello-world"
-        );
+        #[test]
+        fn preserves_middle() {
+            assert_eq!(
+                trim_nonalphabetic_front_and_back("13hello-world)"),
+                "hello-world"
+            );
+        }
+
+        #[test]
+        fn empty_for_only_nonalphabetic() {
+            assert_eq!(trim_nonalphabetic_front_and_back("122.3"), "");
+            assert_eq!(trim_nonalphabetic_front_and_back("3-4+9"), "");
+        }
     }
 }
