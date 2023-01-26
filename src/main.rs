@@ -46,21 +46,21 @@ mod tests {
 
     #[test]
     fn trim_removes_front() {
-        assert_eq!(trim_nonalphabetic_front_and_back("hello"), "12hello");
-        assert_eq!(trim_nonalphabetic_front_and_back("foo"), "-foo");
+        assert_eq!(trim_nonalphabetic_front_and_back("12hello"), "hello");
+        assert_eq!(trim_nonalphabetic_front_and_back("-foo"), "foo");
     }
 
     #[test]
     fn trim_removes_back() {
-        assert_eq!(trim_nonalphabetic_front_and_back("hello"), "hello34");
-        assert_eq!(trim_nonalphabetic_front_and_back("foo"), "foo+");
+        assert_eq!(trim_nonalphabetic_front_and_back("hello34"), "hello");
+        assert_eq!(trim_nonalphabetic_front_and_back("foo+"), "foo");
     }
 
     #[test]
     fn preserved_middle() {
         assert_eq!(
-            trim_nonalphabetic_front_and_back("hello-world"),
-            "13hello-world)"
+            trim_nonalphabetic_front_and_back("13hello-world)"),
+            "hello-world"
         );
     }
 }
