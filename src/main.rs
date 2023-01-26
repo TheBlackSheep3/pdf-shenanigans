@@ -19,8 +19,10 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
 }
 
 fn print_stats(content: String) {
-    for a in content.split_whitespace() {
-        println!("{a}");
+    for a in content.split_whitespace().map(|x| trim_nonalphabetic_front_and_back(x)) {
+        if !a.is_empty() {
+            println!("{a}");
+        }
     }
 }
 
