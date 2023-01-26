@@ -30,16 +30,24 @@ fn print_stats(content: String) {
         let count = map.entry(word).or_insert(0u32);
         *count += 1;
     }
-    match map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x))
-    {
+    let count: Option<u32> = map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x));
+    let mut vec: Vec<(&str, u32)> = map.into_iter().collect();
+    vec.sort_by(|(_, l), (_, r)| r.cmp(l));
+    let top = if vec.len() < 10 { vec.len() } else { 10 };
+    match count {
         Some(sum) => println!("total word count: {}", sum),
         None => println!("An error occured while counting words"),
     }
-    let mut vec: Vec<(&str, u32)> = map.into_iter().collect();
-    vec.sort_by(|(_,l),(_,r)| r.cmp(l));
-    let top = if vec.len() < 10 { vec.len() } else { 10 };
     for t in &vec[..top] {
-        println!("{t:?}");
+        match count {
+            Some(sum) => println!(
+                "{0}: {1} times ({2:.2} %)",
+                t.0,
+                t.1,
+                (t.1 as f32) / (sum as f32) * 100f32
+            ),
+            None => println!("{0}: {1} times", t.0, t.1),
+        }
     }
 }
 
