@@ -19,7 +19,7 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
 }
 
 fn print_stats(content: String) {
-    for a in content.split_whitespace().map(|x| trim_nonalphabetic_front_and_back(x)) {
+    for a in content.split_whitespace()/*.map(|x| trim_nonalphabetic_front_and_back(x))*/ {
         if !a.is_empty() {
             println!("{a}");
         }
@@ -79,6 +79,11 @@ mod tests {
         fn empty_for_only_nonalphabetic() {
             assert_eq!(trim_nonalphabetic_front_and_back("122.3"), "");
             assert_eq!(trim_nonalphabetic_front_and_back("3-4+9"), "");
+        }
+
+        #[test]
+        fn do_not_panic() {
+            assert_eq!(trim_nonalphabetic_front_and_back("hiermit:○"), "hiermit");
         }
     }
 }
