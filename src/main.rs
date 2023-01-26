@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn main() {
     let path: Option<String> = std::env::args().nth(1);
     match path {
@@ -19,13 +21,20 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
 }
 
 fn print_stats(content: String) {
-    for a in content
+    let mut map = HashMap::new();
+    for word in content
         .split_whitespace()
         .map(|x| trim_nonalphabetic_front_and_back(x))
+        .filter(|x| !x.is_empty())
     {
-        if !a.is_empty() {
-            println!("{a}");
-        }
+        let count = map.entry(word).or_insert(0u32);
+        *count += 1;
+    }
+    println!("{:?}", map);
+    match map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x))
+    {
+        Some(sum) => println!("total word count: {}", sum),
+        None => println!("An error occured while counting words"),
     }
 }
 
