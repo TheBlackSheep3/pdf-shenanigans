@@ -2,15 +2,22 @@ use std::collections::HashMap;
 
 fn main() {
     let path: Option<String> = std::env::args().nth(1);
+    let count: usize = match std::env::args()
+        .nth(2)
+        .and_then(|x| x.parse::<usize>().ok())
+    {
+        Some(val) => val,
+        None => 10,
+    };
     match path {
-        Some(x) => process(x),
+        Some(x) => process(x, count),
         None => println!("missing path as argument"),
     }
 }
 
-fn process(path_string: String) {
+fn process(path_string: String, count: usize) {
     match get_content(&path_string) {
-        Ok(content) => print_stats(content),
+        Ok(content) => print_stats(content, count),
         Err(error) => println!("{error}"),
     }
 }
@@ -20,7 +27,7 @@ fn get_content(path_string: &str) -> Result<String, pdf_extract::OutputError> {
     pdf_extract::extract_text(path)
 }
 
-fn print_stats(content: String) {
+fn print_stats(content: String, count: usize) {
     let mut map = HashMap::<&str, u32>::new();
     for word in content
         .split_whitespace()
@@ -30,16 +37,16 @@ fn print_stats(content: String) {
         let count = map.entry(word).or_insert(0u32);
         *count += 1;
     }
-    let count: Option<u32> = map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x));
+    let total_count: Option<u32> = map.iter().try_fold(0u32, |acc, (_, &x)| acc.checked_add(x));
     let mut vec: Vec<(&str, u32)> = map.into_iter().collect();
     vec.sort_by(|(_, l), (_, r)| r.cmp(l));
-    let top = if vec.len() < 10 { vec.len() } else { 10 };
-    match count {
+    let top: usize = if vec.len() < count { vec.len() } else { count };
+    match total_count {
         Some(sum) => println!("total word count: {}", sum),
         None => println!("An error occured while counting words"),
     }
     for t in &vec[..top] {
-        match count {
+        match total_count {
             Some(sum) => println!(
                 "{0}: {1} times ({2:.2} %)",
                 t.0,
